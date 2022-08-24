@@ -5,14 +5,15 @@ const { jwtSecret } = require("../config")
 const Users = require("./users")
 
 class Auth{
-
+    constructor(){
+        // añadido el userservice al constructor de la clase
+        this.userService = new Users()
+    }
     async login(credentials){
         const {email,password} = credentials
-        const userService = new Users()
-
-        const user = await userService.getByEmail(email)
-
-        if(user && this.compare(password,user.password)){
+        const user = await this.userService.getByEmail(email)
+        // El compare es async
+        if(user && await this.compare(password,user.password)){
             delete user.password
             const token = this.createToken(user)
 
@@ -23,7 +24,6 @@ class Auth{
             }
         }
 
-
         return {
             success:false,
             message:"Credenciales incorrectas. Verificar."
@@ -32,10 +32,18 @@ class Auth{
     }
 
     async signup(credentials){
-        console.log(credentials)
-        const userService = new Users()
+        // comprobacion de existencia de usuario
+
+        const {email}=credentials
+        const userExist = await this.userService.getByEmail(email)
+
+        if(userExist) return {
+            success:false,
+            message:"User Alredy have an account"
+        }
+        
         credentials.password = await this.encrypt(credentials.password)
-        const user = await userService.create(credentials)
+        const user = await this.userService.create(credentials)
 
         if(user){
             const token = this.createToken(user)
@@ -86,6 +94,22 @@ class Auth{
     async compare(text,hash){
         const result = await bcrypt.compare(text,hash)
         return result //true o false
+    }
+    // Usar funcionalidad
+    verify_credentials(credentials,select='login'){
+        const response = {
+            login:(credentials)=>{
+                const {email,password} = credentials
+                if(!email && !password) return false
+                return true
+            },
+            signup:(credentials)=>{
+                const {email,password,name} = credentials
+                if(!email && !password && !name) return false
+                return true
+            },
+        }
+        return response[select](credentials)
     }
 }
 
