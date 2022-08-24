@@ -1,6 +1,9 @@
 const express = require("express")
+const cookie_response = require("../helpers/cookie_response")
 
 const Auth = require("../services/auth")
+// helper
+
 
 function auth(app){
     const router = express.Router()
@@ -12,22 +15,18 @@ function auth(app){
     router.post("/login",async (req,res)=>{
 
         const user = await authService.login(req.body)
-
-        return res.cookie("token",user.token,{
-            httpOnly:true,
-            expires: new Date(new Date().setDate(new Date().getDate() + 7)),
-            secure:false
-        }).json(user)
+        if(user.success)
+            cookie_response(req,res,user)
+        else
+            return res.json(user)
     })
     router.post("/signup",async (req,res)=>{
 
         const user = await authService.signup(req.body)
-
-        return res.cookie("token",user.token,{
-            httpOnly:true,
-            expires: new Date(new Date().setDate(new Date().getDate() + 7)),
-            secure:false
-        }).json(user)
+        if(user.success)
+            cookie_response(req,res,user)
+        else
+            return res.json(user)
     })
 
     router.post("/validate",(req,res)=>{
