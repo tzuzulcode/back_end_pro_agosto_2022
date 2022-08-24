@@ -1,6 +1,6 @@
 const express = require("express")
 
-const Auth = require("../services/auth")
+const Auth = require("../services/authentication")
 
 function auth(app){
     const router = express.Router()
