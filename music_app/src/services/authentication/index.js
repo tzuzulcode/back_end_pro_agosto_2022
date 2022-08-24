@@ -8,22 +8,6 @@ class Auth {
         this.userService = new User()
     }
 
-    async #encrypt(password) {
-        const salt = await bcrypt.genSalt(10)
-        return await bcrypt.hash(password, salt)
-    }
-
-    async #compare(password, passwordEncrypt) {
-        return await bcrypt.compare(password, passwordEncrypt)
-    }
-
-    #getToken(user) {
-        const token = jwt.sign(user, jwtSecret, {
-            expiresIn: '2d'
-        })
-        return { success: true, user, token }
-    }
-
     async login(credentials) {
         try {
             const { email, password } = credentials
@@ -41,9 +25,12 @@ class Auth {
                 success: false,
                 message: ['Invalid credentials']
             }
-            return this.#buildUserData({ user })
+            return this.#buildUserData(user)
         } catch (error) {
-            return error
+            return {
+                success:false,
+                message:error.message
+            }
         }
     }
 
@@ -56,19 +43,38 @@ class Auth {
             if (!result.success) return result
             return this.#buildUserData(result)
         } catch (error) {
-            return error
+            return {
+                success:false,
+                message:error.message
+            }
         }
     }
 
-    #buildUserData({ user }) {
+    #buildUserData(user) {
         const data = {
             id: user.id,
             name: user.name,
             email: user.email,
-            role: user.role
+            // role: user.role
         }
         const result = this.#getToken(data)
         return result
+    }
+
+    async #encrypt(password) {
+        const salt = await bcrypt.genSalt(10)
+        return await bcrypt.hash(password, salt)
+    }
+
+    async #compare(password, passwordEncrypt) {
+        return await bcrypt.compare(password, passwordEncrypt)
+    }
+
+    #getToken(user) {
+        const token = jwt.sign(user, jwtSecret, {
+            expiresIn: '2d'
+        })
+        return { success: true, user, token }
     }
 }
 
