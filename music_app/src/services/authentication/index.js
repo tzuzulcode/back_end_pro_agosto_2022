@@ -24,10 +24,11 @@ class Auth {
         return { success: true, user, token }
     }
 
-    async logIn(credentials) {
+    async login(credentials) {
         try {
             const { email, password } = credentials
-            const user = await this.userService.getOneByEmail(email)
+            
+            const user = await this.userService.getOneByEmail(email);
 
             if (!user) return {
                 success: false,
@@ -46,7 +47,7 @@ class Auth {
         }
     }
 
-    async register(data) {
+    async signup(data) {
         try {
             if (data && data.password) {
                 data.password = await this.#encrypt(data.password)
