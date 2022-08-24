@@ -23,7 +23,7 @@ class Auth {
 
             if (!compare) return {
                 success: false,
-                message: ['Invalid credentials']
+                message: 'Invalid credentials'
             }
             return this.#buildUserData(user)
         } catch (error) {
@@ -41,7 +41,7 @@ class Auth {
             }
             const result = await this.userService.create(data)
             if (!result.success) return result
-            return this.#buildUserData(result)
+            return this.#buildUserData(result.data)
         } catch (error) {
             return {
                 success:false,

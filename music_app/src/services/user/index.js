@@ -20,11 +20,20 @@ class Users {
 
     async create(userData) {
         try {
-            return await client.user.create({
+            const user = await client.user.create({
                 data: userData
             })
+
+            return {
+                success:true,
+                data:user
+            }
         } catch (error) {
             console.log(error);
+            return {
+                success:false,
+                message:"An error ocurred"
+            }
         }
     }
 
@@ -49,9 +58,15 @@ class Users {
                 }
             })
 
-            return user
+            return {
+                success:true,
+                data:user
+            }
         } catch (error) {
-            console.log(error);
+            return {
+                success:false,
+                message:error.message
+            }
         }
     }
 }
