@@ -1,4 +1,5 @@
 const client = require('./libs/client')
+const {Prisma} = require("@prisma/client")
 
 class Users {
     async getAll() {
@@ -41,6 +42,15 @@ class Users {
             }
         } catch (error) {
             console.log(error)
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                // The .code property can be accessed in a type-safe manner
+                if (error.code === 'P2002') {
+                  return {
+                    success:false,
+                    message: 'There is a unique constraint violation, a new user cannot be created with this '+error.meta.target[0]
+                  }
+                }
+            }
             return {
                 success:false,
                 message:error.message
