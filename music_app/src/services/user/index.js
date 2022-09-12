@@ -2,42 +2,67 @@ const client = require('../../libs/db')
 
 class Users {
     async getAll() {
-        return await client.user.findMany()
+        try {
+            return await client.user.findMany()
+        } catch (error) {
+            return {
+                success: false,
+                message: " An error ocurred"
+            }
+        }
     }
 
     async getOneByEmail(email) {
         try {
-            return await client.user.findFirst({
+            const user = await client.user.findFirst({
                 where: {
                     email
                 }
             })
 
+            return user
         } catch (error) {
-            console.log(error);
+            return {
+                success: false,
+                message: " An error ocurred"
+            }
         }
     }
 
     async create(userData) {
         try {
-            return await client.user.create({
+            const user = await client.user.create({
                 data: userData
             })
+            return {
+                success: true,
+                data: user
+            }
         } catch (error) {
-            console.log(error);
+            return {
+                success: false,
+                message: " An error ocurred"
+            }
         }
     }
 
     async update(iduser, data) {
-        const id = Number.parseInt(iduser)
-        const user = await client.user.update({
-            where: {
-                id
-            },
-            data
-        })
+        try {
+            const id = Number.parseInt(iduser)
+            const user = await client.user.update({
+                where: {
+                    id
+                },
+                data
+            })
 
-        return user
+            return user
+        } catch (error) {
+            return {
+                success: false,
+                message: " An error ocurred"
+            }
+        }
     }
 
     async delete(idUser) {
@@ -51,7 +76,10 @@ class Users {
 
             return user
         } catch (error) {
-            console.log(error);
+            return {
+                success: false,
+                message: " An error ocurred"
+            }
         }
     }
 }

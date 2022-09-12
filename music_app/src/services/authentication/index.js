@@ -8,26 +8,10 @@ class Auth {
         this.userService = new User()
     }
 
-    async #encrypt(password) {
-        const salt = await bcrypt.genSalt(10)
-        return await bcrypt.hash(password, salt)
-    }
-
-    async #compare(password, passwordEncrypt) {
-        return await bcrypt.compare(password, passwordEncrypt)
-    }
-
-    #getToken(user) {
-        const token = jwt.sign(user, jwtSecret, {
-            expiresIn: '2d'
-        })
-        return { success: true, user, token }
-    }
-
     async login(credentials) {
         try {
             const { email, password } = credentials
-            
+
             const user = await this.userService.getOneByEmail(email);
 
             if (!user) return {
@@ -41,7 +25,7 @@ class Auth {
                 success: false,
                 message: ['Invalid credentials']
             }
-            return this.#buildUserData({ user })
+            return this.#buildUserData(user)
         } catch (error) {
             return error
         }
@@ -54,13 +38,16 @@ class Auth {
             }
             const result = await this.userService.create(data)
             if (!result.success) return result
-            return this.#buildUserData(result)
+            return this.#buildUserData(result.data)
         } catch (error) {
-            return error
+            return { 
+                success: false,
+                message: error.message 
+            }
         }
     }
 
-    #buildUserData({ user }) {
+    #buildUserData(user) {
         const data = {
             id: user.id,
             name: user.name,
@@ -69,6 +56,22 @@ class Auth {
         }
         const result = this.#getToken(data)
         return result
+    }
+
+    async #encrypt(password) {
+        const salt = await bcrypt.genSalt(10)
+        return await bcrypt.hash(password, salt)
+    }
+ 
+    async #compare(password, passwordEncrypt) {
+        return await bcrypt.compare(password, passwordEncrypt)
+    }
+
+    #getToken(user) {
+        const token = jwt.sign(user, jwtSecret, {
+            expiresIn: '2d'
+        })
+        return { success: true, user, token }
     }
 }
 
