@@ -1,5 +1,4 @@
 const express = require("express")
-
 const Auth = require("../services/authentication")
 
 function auth(app){

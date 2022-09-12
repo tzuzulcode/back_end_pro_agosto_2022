@@ -9,6 +9,10 @@ class UsersRepository{
         this.#db = db
     }
 
+    getAll() {
+        return this.#db.findMany()
+    }
+
     create(data){
         return this.#db.create({data})
     }

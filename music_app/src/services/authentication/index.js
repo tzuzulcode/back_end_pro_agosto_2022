@@ -11,7 +11,7 @@ class Auth {
     async login(credentials) {
         try {
             const { email, password } = credentials
-            
+
             const user = await this.userService.getOneByEmail(email);
 
             if (!user) return {
@@ -43,25 +43,9 @@ class Auth {
             if (!result.success) return result
             return this.#buildUserData(result.data)
         } catch (error) {
-            return {
-                success:false,
-                message:error.message
-            }
-        }
-    }
-
-    validate(token){
-        try {
-            const user = jwt.verify(token,jwtSecret)
-
-            return {
-                success:true,
-                data:user
-            }
-        } catch (error) {
-            return {
-                success:false,
-                data:error.message
+            return { 
+                success: false,
+                message: error.message 
             }
         }
     }
@@ -81,7 +65,7 @@ class Auth {
         const salt = await bcrypt.genSalt(10)
         return await bcrypt.hash(password, salt)
     }
-
+ 
     async #compare(password, passwordEncrypt) {
         return await bcrypt.compare(password, passwordEncrypt)
     }

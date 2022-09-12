@@ -7,6 +7,10 @@ class UsersPersistenceAdapter{
         this.usersRepository = usersRepository
     }
 
+    getAllUsers() {
+        return this.usersRepository.getAll()
+    }
+
     createUser(data){
         return this.usersRepository.create(data)
     }
