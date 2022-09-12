@@ -1,3 +1,4 @@
+const { Prisma } = require('@prisma/client');
 const client = require('../../libs/db')
 
 class Users {
@@ -74,7 +75,10 @@ class Users {
                 }
             })
 
-            return user
+            return {
+                success:true,
+                data:user
+            }
         } catch (error) {
             return {
                 success: false,
