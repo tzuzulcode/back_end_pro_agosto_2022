@@ -7,6 +7,10 @@ class UserService{
         this.#createUserPort = createUserPort
     }
 
+    getAllUsers() {
+        return this.#createUserPort.getAllUsers()
+    }
+
     createUser(data){
         return this.#createUserPort.createUser(data)
     }

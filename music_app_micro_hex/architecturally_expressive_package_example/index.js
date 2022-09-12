@@ -1,25 +1,26 @@
-const { PrismaClient } = require(".prisma/client")
-const express = require("express")
-const UsersService = require("./users/application/service/UserService")
-const UsersRepository = require("./users/adapter/out/persistence/UsersRepository")
-const UsersPersistenceAdapter = require("./users/adapter/out/persistence/UsersPersistenceAdapter")
-const UsersController = require("./users/adapter/in/web/UsersController")
+const express = require('express')
+const { PrismaClient } = require('@prisma/client')
+const UserService = require('./users/application/service/UserService')
+const UsersRepository = require('./users/adapter/out/persistence/UsersRepository')
+const UsersPersistenceAdapter = require('./users/adapter/out/persistence/UsersPersistenceAdapter')
+const UsersController = require('./users/adapter/in/web/UsersController')
+const morgan = require('morgan')
 
+const port = 4000
 const app = express()
-
 app.use(express.json())
+app.use(morgan('dev'))
 
 const client = new PrismaClient()
 
-// const client = new PrismaClient()
-
-const usersService = new UsersService(new UsersPersistenceAdapter(new UsersRepository(client.user)))
-const usersController = new UsersController(usersService)
-
+const userService = new UserService(new UsersPersistenceAdapter(new UsersRepository(client.user)))
+const usersController = new UsersController(userService)
 const createUser = usersController.createUser.bind(usersController)
+const getAllUsers = usersController.getAllUsers.bind(usersController)
 
-app.post("/",createUser)
+app.get('/all', getAllUsers)
+app.post('/create', createUser)
 
-app.listen(4000,()=>{
-    console.log("Listening on: http://localhost:4000")
+app.listen(port, () => {
+    console.log('Running in: http://localhost:' + port)
 })
